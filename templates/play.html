@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+
+{% block title %}Play Bingo{% endblock %}
+
+{% block content %}
+<!-- Tutorial Overlay -->
+<div id="tutorialOverlay" class="tutorial-overlay">
+    <div class="tutorial-content">
+        <div class="tutorial-header">
+            <h2><i class="fas fa-graduation-cap"></i> How to Play Bingo</h2>
+            <button class="tutorial-close" onclick="closeTutorial()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="tutorial-steps">
+            <div class="tutorial-step active" data-step="1">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Start a New Game</h3>
+                    <p>Click the <strong>"Start New Game"</strong> button to begin. This will reset all called numbers and prepare for a fresh game.</p>
+                    <div class="step-visual">
+                        <button class="btn btn-success demo-btn">
+                            <i class="fas fa-play"></i> Start New Game
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="tutorial-step" data-step="2">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Call Numbers</h3>
+                    <p>Click <strong>"Call Number"</strong> to randomly select a number from 1-75. Each number belongs to a letter: <span class="bingo-letter b">B</span>(1-15), <span class="bingo-letter i">I</span>(16-30), <span class="bingo-letter n">N</span>(31-45), <span class="bingo-letter g">G</span>(46-60), <span class="bingo-letter o">O</span>(61-75).</p>
+                </div>
+            </div>
+            <div class="tutorial-step" data-step="3">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Mark Your Card</h3>
+                    <p>When a number is called, <strong>click on that number</strong> on your bingo card if you have it. Marked numbers will turn green. The center square is <strong>FREE</strong> and is automatically marked.</p>
+                </div>
+            </div>
+            <div class="tutorial-step" data-step="4">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Win the Game!</h3>
+                    <p>Get <strong>5 numbers in a row</strong> (horizontal, vertical, or diagonal) to win! The game will automatically detect when you have BINGO and celebrate your victory!</p>
+                    <div class="win-patterns">
+                        <div class="pattern">→ Horizontal</div>
+                        <div class="pattern">↓ Vertical</div>
+                        <div class="pattern">↘ Diagonal</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tutorial-navigation">
+            <button class="btn btn-secondary" onclick="previousTutorialStep()" id="prevBtn" disabled>
+                <i class="fas fa-arrow-left"></i> Previous
+            </button>
+            <div class="tutorial-dots">
+                <button class="dot active" onclick="goToTutorialStep(1)" aria-label="Go to step 1"></button>
+                <button class="dot" onclick="goToTutorialStep(2)" aria-label="Go to step 2"></button>
+                <button class="dot" onclick="goToTutorialStep(3)" aria-label="Go to step 3"></button>
+                <button class="dot" onclick="goToTutorialStep(4)" aria-label="Go to step 4"></button>
+            </div>
+            <button class="btn btn-primary" onclick="nextTutorialStep()" id="nextBtn">
+                Next <i class="fas fa-arrow-right"></i>
+            </button>
+        </div>
+        <div class="tutorial-footer">
+            <label class="tutorial-checkbox">
+                <input type="checkbox" id="dontShowAgain"> Don't show this tutorial again
+            </label>
+        </div>
+    </div>
+</div>
+
+<div class="game-container">
+    <!-- Game Controls -->
+    <div class="game-controls">
+        <div class="control-section">
+            <div class="section-header">
+                <h2 class="section-title">Game Controls</h2>
+                <button class="btn-help" onclick="showTutorial()" title="Show Tutorial">
+                    <i class="fas fa-question-circle"></i>
+                </button>
+            </div>
+            <div class="game-status" id="gameStatus">
+                <div class="status-item">
+                    <span class="status-label">Status:</span>
+                    <span class="status-value" id="statusText">Ready to Start</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Numbers Called:</span>
+                    <span class="status-value" id="numbersCalledCount">0/75</span>
+                </div>
+            </div>
+            <div class="control-buttons">
+                <button id="startGameBtn" class="btn btn-success">
+                    <i class="fas fa-play"></i>
+                    <span>Start New Game</span>
+                    <small>Begin playing!</small>
+                </button>
+                <button id="callNumberBtn" class="btn btn-primary" {% if not game_active %}disabled{% endif %}>
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Call Number</span>
+                    <small>Draw next number</small>
+                </button>
+                <button id="newCardBtn" class="btn btn-secondary">
+                    <i class="fas fa-sync-alt"></i>
+                    <span>New Card</span>
+                    <small>Generate new card</small>
+                </button>
+            </div>
+            <div class="game-hints" id="gameHints">
+                <div class="hint" id="currentHint">
+                    <i class="fas fa-lightbulb"></i>
+                    <span>Click "Start New Game" to begin playing!</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="current-call">
+            <div class="call-display">
+                <div class="call-letter" id="currentLetter">
+                    {% if current_number %}
+                        {% if current_number <= 15 %}B{% elif current_number <= 30 %}I{% elif current_number <= 45 %}N{% elif current_number <= 60 %}G{% else %}O{% endif %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+                <div class="call-number" id="currentNumber">
+                    {{ current_number or '-' }}
+                </div>
+            </div>
+            <div class="call-label">Current Call</div>
+        </div>
+    </div>
+
+    <!-- Bingo Card -->
+    <div class="bingo-section">
+        <div class="bingo-card-container">
+            <div class="card-header">
+                <h2 class="section-title">Your Bingo Card</h2>
+                <div class="card-instructions">
+                    <p><i class="fas fa-hand-pointer"></i> Click on called numbers to mark them</p>
+                    <p><i class="fas fa-star"></i> Get 5 in a row to win!</p>
+                </div>
+            </div>
+            <div class="bingo-card">
+                <div class="bingo-header">
+                    <div class="header-cell">B</div>
+                    <div class="header-cell">I</div>
+                    <div class="header-cell">N</div>
+                    <div class="header-cell">G</div>
+                    <div class="header-cell">O</div>
+                </div>
+                <div class="bingo-grid">
+                    {% for row_idx in range(5) %}
+                        <div class="bingo-row">
+                            {% for col_idx in range(5) %}
+                                <button class="bingo-cell {% if marked[row_idx][col_idx] %}marked{% endif %} {% if row_idx == 2 and col_idx == 2 %}free-space{% endif %}" 
+                                        data-row="{{ row_idx }}" 
+                                        data-col="{{ col_idx }}"
+                                        type="button">
+                                    {{ bingo_card[row_idx][col_idx] }}
+                                </button>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Called Numbers -->
+    <div class="called-numbers-section">
+        <h3>Called Numbers</h3>
+        <div class="called-numbers-container">
+            <div class="number-columns">
+                <div class="number-column">
+                    <div class="column-header">B</div>
+                    <div class="column-numbers" id="b-numbers"></div>
+                </div>
+                <div class="number-column">
+                    <div class="column-header">I</div>
+                    <div class="column-numbers" id="i-numbers"></div>
+                </div>
+                <div class="number-column">
+                    <div class="column-header">N</div>
+                    <div class="column-numbers" id="n-numbers"></div>
+                </div>
+                <div class="number-column">
+                    <div class="column-header">G</div>
+                    <div class="column-numbers" id="g-numbers"></div>
+                </div>
+                <div class="number-column">
+                    <div class="column-header">O</div>
+                    <div class="column-numbers" id="o-numbers"></div>
+                </div>
+            </div>
+        </div>
+        <div class="numbers-count">
+            Total Called: <span id="totalCalled">{{ called_numbers|length }}</span>/75
+        </div>
+    </div>
+</div>
+
+<!-- Win Modal -->
+<div id="winModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-trophy"></i> BINGO!</h2>
+        </div>
+        <div class="modal-body">
+            <p>Congratulations! You won with:</p>
+            <div class="winning-pattern" id="winningPattern"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-primary" onclick="closeWinModal()">
+                <i class="fas fa-check"></i>
+                Continue Playing
+            </button>
+            <button class="btn btn-success" onclick="startNewGame()">
+                <i class="fas fa-play"></i>
+                New Game
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Game Messages -->
+<div id="messageContainer" class="message-container"></div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Game Data -->
+<script id="game-data" type="application/json">
+{
+    "calledNumbers": {{ called_numbers | tojson }},
+    "gameActive": {{ game_active | tojson }}
+}
+</script>
+<script src="{{ url_for('static', filename='js/game.js') }}"></script>
+<script>
+    // Initialize game with data from template
+    document.addEventListener('DOMContentLoaded', function() {
+        const gameData = JSON.parse(document.getElementById('game-data').textContent);
+        if (typeof updateCalledNumbersDisplay === 'function') {
+            updateCalledNumbersDisplay(gameData.calledNumbers);
+        }
+        if (typeof window !== 'undefined') {
+            window.gameActive = gameData.gameActive;
+        }
+        
+        // Add click event listeners to bingo cells
+        document.querySelectorAll('.bingo-cell').forEach(function(cell) {
+            cell.addEventListener('click', function() {
+                const row = parseInt(this.getAttribute('data-row'));
+                const col = parseInt(this.getAttribute('data-col'));
+                if (typeof markSquare === 'function') {
+                    markSquare(row, col);
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

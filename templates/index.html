@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Welcome to Bingo Master{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1 class="hero-title">
+                <span class="bingo-letters">
+                    <span class="letter b">B</span>
+                    <span class="letter i">I</span>
+                    <span class="letter n">N</span>
+                    <span class="letter g">G</span>
+                    <span class="letter o">O</span>
+                </span>
+                <span class="master-text">MASTER</span>
+            </h1>
+            <p class="hero-subtitle">Experience the classic game of Bingo like never before!</p>
+            <div class="hero-features">
+                <div class="feature">
+                    <i class="fas fa-random"></i>
+                    <span>Random Number Generation</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-trophy"></i>
+                    <span>Win Detection</span>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-mobile-alt"></i>
+                    <span>Responsive Design</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-actions">
+            <a href="/play" class="btn btn-primary btn-large">
+                <i class="fas fa-play"></i>
+                Start Playing
+            </a>
+            <div class="game-info">
+                <div class="info-card">
+                    <h3>How to Play</h3>
+                    <ul>
+                        <li>Get your bingo card with random numbers</li>
+                        <li>Numbers will be called automatically</li>
+                        <li>Click on called numbers to mark them</li>
+                        <li>Get 5 in a row, column, or diagonal to win!</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="features-section">
+    <div class="container">
+        <h2 class="section-title">Game Features</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-th"></i>
+                </div>
+                <h3>Interactive Bingo Cards</h3>
+                <p>Click to mark numbers as they're called. Visual feedback shows your progress towards a win.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bullhorn"></i>
+                </div>
+                <h3>Automatic Number Calling</h3>
+                <p>Numbers are called randomly from 1-75, following traditional bingo letter assignments.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-medal"></i>
+                </div>
+                <h3>Win Detection</h3>
+                <p>Automatically detects when you achieve bingo with rows, columns, or diagonals.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h3>New Game Anytime</h3>
+                <p>Start fresh with a new card and reset the called numbers whenever you want.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <div class="container">
+        <div class="cta-content">
+            <h2>Ready to Play?</h2>
+            <p>Join the fun and test your luck with our modern bingo game!</p>
+            <a href="/play" class="btn btn-secondary btn-large">
+                <i class="fas fa-gamepad"></i>
+                Play Now
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
