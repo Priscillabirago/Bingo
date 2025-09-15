@@ -1,7 +1,6 @@
 // Game-specific JavaScript functionality
 
 // Game state
-let currentMarkedSquares = [];
 let hasWon = false;
 let currentTutorialStep = 1;
 let lastCalledNumber = null;
@@ -23,9 +22,6 @@ function initializeGame() {
     updateGameButtons();
     updateGameStatus();
     updateHints();
-    
-    // Load current marked squares from the page
-    loadCurrentMarkedSquares();
     
     // Start periodic game status updates
     if (gameActive) {
@@ -101,6 +97,7 @@ async function startNewGame() {
             startGameStatusUpdates();
         }
     } catch (error) {
+        console.error('Failed to start new game:', error);
         showMessage('Failed to start new game', 'error');
     } finally {
         setButtonLoading(button, false);
@@ -151,6 +148,7 @@ async function callNextNumber() {
             updateGameButtons();
         }
     } catch (error) {
+        console.error('Failed to call number:', error);
         showMessage('Failed to call number', 'error');
     } finally {
         setButtonLoading(button, false);
@@ -192,6 +190,7 @@ async function markSquare(row, col) {
             }
         }
     } catch (error) {
+        console.error('Failed to mark square:', error);
         showMessage('Failed to mark square', 'error');
     }
 }
@@ -210,6 +209,7 @@ async function generateNewCard() {
             location.reload();
         }
     } catch (error) {
+        console.error('Failed to generate new card:', error);
         showMessage('Failed to generate new card', 'error');
     } finally {
         setButtonLoading(button, false);
@@ -297,17 +297,6 @@ function updateGameButtons() {
     if (startGameBtn) {
         startGameBtn.textContent = gameActive ? 'Restart Game' : 'Start New Game';
     }
-}
-
-function loadCurrentMarkedSquares() {
-    const markedCells = document.querySelectorAll('.bingo-cell.marked');
-    currentMarkedSquares = [];
-    
-    markedCells.forEach(cell => {
-        const row = parseInt(cell.dataset.row);
-        const col = parseInt(cell.dataset.col);
-        currentMarkedSquares.push([row, col]);
-    });
 }
 
 function showWinModal(winningPattern) {
@@ -401,7 +390,7 @@ function closeTutorial() {
         overlay.classList.add('hidden');
     }
     
-    if (dontShowAgain && dontShowAgain.checked) {
+    if (dontShowAgain?.checked) {
         localStorage.setItem('bingo_tutorial_seen', 'true');
     }
 }
